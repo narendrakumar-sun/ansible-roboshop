@@ -1,4 +1,4 @@
-- name: configure shipping
+- name: configure shipping server
   hosts: shipping
   become: yes
   tasks:
@@ -17,7 +17,7 @@
       home: /app
       shell: /sbin/nologin
       comment: "Roboshop system user"
-
+  
   - name: delete app directory
     ansible.builtin.file:
       path: /app
@@ -43,7 +43,7 @@
       src: /tmp/shipping.zip
       dest: /app
       remote_src: yes
-
+  
   - name: install dependencies
     ansible.builtin.command: mvn clean package
     args:
@@ -62,6 +62,14 @@
   - name: daemon reload
     ansible.builtin.systemd_service:
       daemon_reload: true
+
+  - name: install dependencie
+    ansible.builtin.pip:
+      name: "{{ item }}"
+      executable: pip3.9
+    loop:
+    - cryptography
+    - PyMySQL
 
   - name: import shipping data
     community.mysql.mysql_db:
